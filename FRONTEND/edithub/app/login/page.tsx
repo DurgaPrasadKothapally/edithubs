@@ -7,11 +7,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string; message?: string };
+  searchParams: Promise<{
+    error?: string;
+    message?: string;
+  }>;
 }) {
+  const params = await searchParams;
+
   return (
     <div className="min-h-screen bg-background-DEFAULT flex items-center justify-center px-4">
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -25,16 +30,20 @@ export default function LoginPage({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent-gradient shadow-glow-accent mb-4">
             <Clapperboard size={28} className="text-white" />
           </div>
+
           <h1 className="font-display text-2xl font-bold text-text-primary">
             <span className="gradient-text">Prasads</span>
             <span className="text-text-primary">_Visuals</span>
           </h1>
-          <p className="text-text-muted text-sm mt-1">Sign in to your account</p>
+
+          <p className="text-text-muted text-sm mt-1">
+            Sign in to your account
+          </p>
         </div>
 
         {/* Card */}
         <div className="glass rounded-3xl border border-white/8 p-8 shadow-glass">
-          <LoginForm error={searchParams.error} />
+          <LoginForm error={params.error} />
         </div>
 
         <p className="text-center text-text-muted text-xs mt-6">

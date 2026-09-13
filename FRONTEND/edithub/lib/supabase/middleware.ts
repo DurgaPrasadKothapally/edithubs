@@ -1,8 +1,25 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: {
+    domain?: string;
+    encode?: (value: string) => string;
+    expires?: Date;
+    httpOnly?: boolean;
+    maxAge?: number;
+    path?: string;
+    sameSite?: 'lax' | 'strict' | 'none' | boolean;
+    secure?: boolean;
+  };
+};
+
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,22 +29,31 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options as Parameters<typeof supabaseResponse.cookies.set>[2])
-          );
+
+        setAll(cookiesToSet: CookieToSet[]) {
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
+
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, options);
+          });
         },
       },
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
 
-  // Protect admin routes — only authenticated admin can access
+  // Protect admin routes
   if (
     pathname.startsWith('/admin') &&
     !pathname.startsWith('/admin/login') &&
@@ -35,21 +61,26 @@ export async function updateSession(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
+
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated admin away from old /admin/login to dashboard
+  // Redirect authenticated users from admin login
   if (pathname === '/admin/login' && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/dashboard';
+
     return NextResponse.redirect(url);
   }
 
-  // Redirect already-signed-in users away from /login
+  // Redirect signed-in users away from login
   if (pathname === '/login' && user) {
     const adminEmail = process.env.ADMIN_EMAIL;
+
     const url = request.nextUrl.clone();
-    url.pathname = user.email === adminEmail ? '/admin/dashboard' : '/';
+    url.pathname =
+      user.email === adminEmail ? '/admin/dashboard' : '/';
+
     return NextResponse.redirect(url);
   }
 

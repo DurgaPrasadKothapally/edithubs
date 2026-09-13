@@ -25,7 +25,6 @@ export default async function LoginPage({
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent-gradient shadow-glow-accent mb-4">
             <Clapperboard size={28} className="text-white" />
@@ -41,7 +40,6 @@ export default async function LoginPage({
           </p>
         </div>
 
-        {/* Card */}
         <div className="glass rounded-3xl border border-white/8 p-8 shadow-glass">
           <LoginForm error={params.error} />
         </div>

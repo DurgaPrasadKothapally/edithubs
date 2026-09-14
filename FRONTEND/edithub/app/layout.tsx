@@ -9,26 +9,44 @@ export const metadata: Metadata = {
     default: 'Prasads Visuals — Learn. Edit. Create.',
     template: '%s | Prasads Visuals',
   },
+
   description:
     'Professional video editing tutorials, resources, presets, templates, and project files — all in one place.',
+
   keywords: [
-    'video editing tutorials', 'CapCut tutorial', 'After Effects', 'Premiere Pro',
-    'color grading', 'LUTs', 'presets', 'cinematic editing', 'reels editing',
-    'video effects', 'transitions', 'mobile editing',
+    'video editing tutorials',
+    'CapCut tutorial',
+    'After Effects',
+    'Premiere Pro',
+    'color grading',
+    'LUTs',
+    'presets',
+    'cinematic editing',
+    'reels editing',
+    'video effects',
+    'transitions',
+    'mobile editing',
   ],
+
+  verification: {
+    google: 'google8431ff88992c6b21.html',
+  },
+
   openGraph: {
     type: 'website',
     siteName: 'Prasads Visuals',
     title: 'Prasads Visuals — Learn. Edit. Create.',
-    description: 'Professional video editing tutorials, resources, presets, templates, and project files.',
+    description:
+      'Professional video editing tutorials, resources, presets, templates, and project files.',
   },
+
   twitter: {
     card: 'summary_large_image',
     title: 'Prasads Visuals — Learn. Edit. Create.',
-    description: 'Professional video editing tutorials, resources and downloads.',
+    description:
+      'Professional video editing resources and downloads.',
   },
 };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">

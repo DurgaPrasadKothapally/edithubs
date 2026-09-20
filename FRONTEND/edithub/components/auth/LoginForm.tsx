@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, LogIn, Mail, Lock, AlertCircle, Shield } from 'lucide-react';
+import { Eye, EyeOff, LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -38,18 +38,15 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
         return;
       }
 
-      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
-      // Only the admin account is allowed to sign in
-      if (data.user.email !== adminEmail) {
-        // Sign out immediately — non-admin accounts are not permitted
-        await supabase.auth.signOut();
-        setError('Access denied. This portal is for the site administrator only.');
-        return;
+      // Check if this is the admin — redirect accordingly
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+      if (data.user.email?.toLowerCase() === adminEmail.toLowerCase()) {
+        toast.success('Welcome back, Admin!');
+        router.push('/admin/dashboard');
+      } else {
+        toast.success('Signed in!');
+        router.push('/');
       }
-
-      toast.success('Welcome back, Admin!');
-      router.push('/admin/dashboard');
       router.refresh();
     } catch {
       setError('Something went wrong. Please try again.');
@@ -60,14 +57,10 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      {/* Header */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 mb-3">
-          <Shield size={18} className="text-accent" />
-        </div>
-        <h2 className="font-display text-xl font-bold text-text-primary">Admin Sign In</h2>
+        <h2 className="font-display text-xl font-bold text-text-primary">Sign In</h2>
         <p className="text-text-muted text-sm mt-1">
-          Only the site administrator can log in here.
+          Admin accounts go directly to the dashboard.
         </p>
       </div>
 
@@ -83,7 +76,7 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="durga.k6585@gmail.com"
+            placeholder="you@example.com"
             required
             autoComplete="email"
             className="w-full bg-surface border border-surface-border rounded-xl pl-10 pr-4 py-3 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-colors"
@@ -119,7 +112,6 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
         </div>
       </div>
 
-      {/* Error message */}
       {error && (
         <div className="flex items-start gap-2 p-3 rounded-xl bg-error/10 border border-error/20 text-error text-sm">
           <AlertCircle size={15} className="shrink-0 mt-0.5" />
@@ -127,7 +119,6 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
         </div>
       )}
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={loading || !email || !password}
@@ -144,15 +135,14 @@ export function LoginForm({ error: urlError }: LoginFormProps) {
         ) : (
           <>
             <LogIn size={18} />
-            Sign In to Dashboard
+            Sign In
           </>
         )}
       </button>
 
-      {/* Back to site */}
       <div className="text-center pt-2">
         <Link href="/" className="text-text-muted text-sm hover:text-accent transition-colors">
-          ← Back to Prasads Visuals
+          Continue browsing without signing in
         </Link>
       </div>
     </form>
